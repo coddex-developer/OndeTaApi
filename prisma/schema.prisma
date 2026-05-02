@@ -1,0 +1,65 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Usuario {
+  id        String   @id @default(cuid())
+  nome      String?
+  email     String   @unique
+  senha     String
+  criadoEm  DateTime @default(now())
+
+  rastreamentos Rastreamento[]
+  notificacoes  Notificacao[]
+}
+
+model Rastreamento {
+  id               String   @id @default(cuid())
+  codigo           String
+  nome             String?
+  categoria        String?
+  favorito         Boolean  @default(false)
+  statusAtual      String?
+  previsaoEntrega  DateTime?
+  criadoEm         DateTime @default(now())
+
+  usuarioId        String
+  usuario          Usuario @relation(fields: [usuarioId], references: [id])
+
+  eventos          EventoRastreamento[]
+
+  @@unique([usuarioId, codigo])
+}
+
+model EventoRastreamento {
+  id              String   @id @default(cuid())
+  rastreamentoId  String
+  status          String
+  local           String?
+  data            DateTime
+
+  rastreamento    Rastreamento @relation(fields: [rastreamentoId], references: [id])
+
+  @@index([rastreamentoId])
+  @@unique([rastreamentoId, status, data])
+}
+
+model Notificacao {
+  id         String   @id @default(cuid())
+  usuarioId  String
+  mensagem   String
+  lida       Boolean  @default(false)
+  criadaEm   DateTime @default(now())
+
+  usuario    Usuario @relation(fields: [usuarioId], references: [id])
+}
