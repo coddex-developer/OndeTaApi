@@ -6,5 +6,8 @@
     "strict": true,
     "esModuleInterop": true,
     "ignoreDeprecations": "6.0"
+  },
+  "ts-node": {
+    "esm": true
   }
 }
